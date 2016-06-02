@@ -1,10 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Date;
 import java.util.Random;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.sql.Time;
 
 public class GUI implements ActionListener, MouseListener
 {
@@ -27,20 +29,25 @@ public class GUI implements ActionListener, MouseListener
 	private JLabel length;//"length: " label on ask panel
 	private JTextField linput;//user input for length
 	private JTextField winput;//user input for width
-	private int l;//length of board (set to user input)
-	private int w;//width of board(set to user input)
+	private int l;//length of board (set to user input) (rows)
+	private int w;//width of board(set to user input) (cols)
 	private Random gen;//random number generator used to assign a random label to squares marked as mines
 	private String[] labels;//string array for random labels
-	/*private ImageIcon cat;
-	private ImageIcon dog;*/
+	//private ImageIcon cat;
+	private ImageIcon dog; //DON'T GET RID OF - sets the image to nothing because dog is blank
 	private BufferedImage[][] pics;//buffered image two dimensional array for picture pieces from ImageSplit
 	private ImageSplit choppitychop;//ImageSplit object for the image on top of the buttons
-	private ImageIcon currentPic;
+	private ImageIcon currentPic; //used in for loop when creating buttons
+	private Date start; //date object instantiated in setUp() to begin timing
+	private Date end; //date object instantiated once you win to end timing
+	private long startTime; //gets time when you start the game (start.getTime())
+	private long endTime; //gets time when you end the game (end.getTime())
+	private JLabel time; //label on win panel that says how many seconds it took you to solve the game
 	
 	public GUI()
 	{
-		/*dog=new ImageIcon();
-		cat=new ImageIcon("src/Eye.png");*/
+		dog=new ImageIcon(); //no image so shows background color and text
+		//cat=new ImageIcon("src/Eye.png");
 		labels=new String[]{"meow", "quack","boom","woof","poof","brrt", "moo", "dork", "click","zoom","oof","beep","boop","thud","plop"};//labels for mines
 		gen=new Random();
 		f=new JFrame();
@@ -81,7 +88,7 @@ public class GUI implements ActionListener, MouseListener
 	}
 	public void setUp() throws IOException//sets up minesweeper game board
 	{
-		choppitychop = new ImageSplit(w,l);
+		choppitychop = new ImageSplit(l,w);
 		pics = choppitychop.chop();//splits image split object and assigns pieces to pics
 		panel = new JPanel();
 		kaboom = new JPanel();
@@ -91,13 +98,14 @@ public class GUI implements ActionListener, MouseListener
 		current=new JButton();
 		game = new Minesweeper(l,w);
 		boom=new JLabel("kaboom");
-		yay=new JLabel("You Didn't Explode");
+		yay=new JLabel("You Didn't Explode. ");
 		JButton button;//button used for current button when setting up the game board
 		cc.weightx=cc.weighty=1;
 		cc.fill=GridBagConstraints.BOTH;
 		cc.gridx=0;
-		cc.gridy=buttons.length+1;
+		//cc.gridy=buttons.length+1;
 		cc.gridwidth=buttons.length;
+		cc.gridy=0;
 		win.add(yay);
 		kaboom.add(boom);
 		cc.gridwidth=1;
@@ -124,6 +132,8 @@ public class GUI implements ActionListener, MouseListener
 		f.pack();
 		f.setVisible(true);
 		f.setSize(750,750); //width, height
+		start = new Date();
+		startTime = start.getTime();
 	}
 	public void actionPerformed(ActionEvent e)//click
 	{
@@ -160,12 +170,15 @@ public class GUI implements ActionListener, MouseListener
 								{
 									if (game.getOpen()[row][col])
 									{
-										//buttons[row][col].setIcon(dog);
+										buttons[row][col].setIcon(dog);
 										buttons[row][col].setBackground(Color.white);
 										buttons[row][col].setText("");
 										if (game.getMines(row, col)!=0)///number stuff(number of mines touching the selected square
 										{
 											buttons[row][col].setText(Integer.toString(game.getMines(row, col)));
+											if(l>=15 || w>=15)
+												buttons[row][col].setFont(new Font("Sans Serif", Font.PLAIN, 10));
+												
 										}
 									}
 								}
@@ -175,6 +188,10 @@ public class GUI implements ActionListener, MouseListener
 		}
 		if (checkWin())//if all non-mine squares are cleared, a window comes up saying you win
 		{
+			end = new Date();
+			endTime = end.getTime();
+			time = new JLabel("It took you " + (endTime-startTime)/1000 + " seconds");
+			win.add(time);
 			f.setContentPane(win);
 			f.pack();
 			f.setVisible(true);
@@ -239,10 +256,12 @@ public class GUI implements ActionListener, MouseListener
 			
 			else
 			{
-				//current.setIcon(dog);
+				current.setIcon(dog);
 				current.setBackground(Color.RED);//flags a square as a mine upon right click
 				int i=gen.nextInt(labels.length);//random number used for selecting a random label
 				current.setText(labels[i]);//sets text to random label
+				if(l>10 || w>10)
+					current.setFont(new Font("Sans Serif", Font.PLAIN, 8));
 			}
 		}
 	}
