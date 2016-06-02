@@ -22,7 +22,7 @@ public class Minesweeper
 	{
 		return open;
 	}
-	public int getMines()
+	public int getMines()//return total number of mines
 	{
 		int total=0;
 		for (int r=0; r<board.length; r++)
@@ -32,18 +32,11 @@ public class Minesweeper
 			}
 		return total;
 	}
-	public static void main(String[] args)
-	{
-	 Minesweeper b = new Minesweeper(9,9);
-	 System.out.println(b.getMines(0, 0));
-	 b.print();
-	 //print(b.clear(0, 0));
-	}
-	public boolean isMine(int r, int c)
+	public boolean isMine(int r, int c)//returns true if selected square is a mine
 	{
 		return (board[r][c]==1);
 	}
-	public int getMines(int r, int c)
+	public int getMines(int r, int c)//returns the number of mines that surround a selected square
 	{
 		int mc=0;
 		for (int row=r-1; row<=r+1; row++)
@@ -61,7 +54,7 @@ public class Minesweeper
 			}
 		return mc;	
 	}
-	public void print()
+	public void print()//prints the locations of mines using 1's for mines and 0's for non mines
 	{
 		for (int r=0; r<board.length; r++){
 			for (int c=0; c<board[0].length; c++)
@@ -69,13 +62,13 @@ public class Minesweeper
 			System.out.println();
 		}
 	}
-	public void clear(int r, int c)
+	public void clear(int r, int c)//clears max number of non mine squares so the boundary is entirely numbers
 	{
-		if (isMine(r,c))
+		if (isMine(r,c))//if you click a mine you die
 			System.out.println("KABOOM");
 		else
 		{
-			if (getMines(r,c)==0)
+			if (getMines(r,c)==0)//if no mines surround the selected square, that square is cleared and the ones immediately surrounding it are checked
 			{
 				open[r][c]=true;
 				for (int row=r-1; row<=r+1; row++)
@@ -97,11 +90,11 @@ public class Minesweeper
 			}
 			else
 			{
-				open[r][c]=true;
+				open[r][c]=true;//if there are mines in the squares surrounding the selected square, clear the square but don't check the others
 			}
 		}
 	}
-	public static void print(boolean[][] a)
+	public static void print(boolean[][] a)//print the board using true/false to show cleared squares
 	{
 		for (int r=0; r<a.length; r++){
 			for (int c=0; c<a[0].length; c++)

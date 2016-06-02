@@ -8,41 +8,40 @@ import java.io.*;
 
 public class GUI implements ActionListener, MouseListener
 {
-	private JButton[][] buttons;
-	private JFrame f;
-	private JPanel panel;
-	private JPanel kaboom;
-	private JPanel win;
-	private JPanel ask;
-	private Minesweeper game;
-	private GridBagConstraints cc;
-	private JButton current;
-	private int currentr;
-	private int currentc;
-	private JButton go;
-	private JLabel mineNum;
-	private JLabel boom;
-	private JLabel yay;
-	private JLabel boardSize;
-	private JLabel width;
-	private JLabel length;
-	private JTextField linput;
-	private JTextField winput;
-	private int l;
-	private int w;
-	private Random gen;
-	private String[] labels;
-	private ImageIcon cat;
-	private ImageIcon dog;
-	private BufferedImage[][] pics;
-	private ImageSplit choppitychop;
+	private JButton[][] buttons;//grid of buttons forming game board
+	private JFrame f;//frame for game board
+	private JPanel panel;//panel for game board
+	private JPanel kaboom;//panel for kaboom window
+	private JPanel win;//panel for win window
+	private JPanel ask;//panel for starting window asking user what size of board they want to play
+	private Minesweeper game;//the actual game
+	private GridBagConstraints cc;//layout for the panels
+	private JButton current;//button the mouse is currently in (used for right clicks)
+	private int currentr;//row location of current button
+	private int currentc;//column location of current button
+	private JButton go;//go button to start game on ask panel
+	private JLabel boom;//"kaboom" label on kaboom panel
+	private JLabel yay;//"you win" label on win panel
+	private JLabel boardSize;//"what size?" label on ask panel
+	private JLabel width;//"width: " label on ask panel
+	private JLabel length;//"length: " label on ask panel
+	private JTextField linput;//user input for length
+	private JTextField winput;//user input for width
+	private int l;//length of board (set to user input)
+	private int w;//width of board(set to user input)
+	private Random gen;//random number generator used to assign a random label to squares marked as mines
+	private String[] labels;//string array for random labels
+	/*private ImageIcon cat;
+	private ImageIcon dog;*/
+	private BufferedImage[][] pics;//buffered image two dimensional array for picture pieces from ImageSplit
+	private ImageSplit choppitychop;//ImageSplit object for the image on top of the buttons
 	private ImageIcon currentPic;
 	
 	public GUI()
 	{
-		dog=new ImageIcon();
-		cat=new ImageIcon("src/Eye.png");
-		labels=new String[]{"meow", "quack","boom","woof","poof","brrt", "moo", "dork", "click","zoom","oof","beep","boop","thud","plop"};
+		/*dog=new ImageIcon();
+		cat=new ImageIcon("src/Eye.png");*/
+		labels=new String[]{"meow", "quack","boom","woof","poof","brrt", "moo", "dork", "click","zoom","oof","beep","boop","thud","plop"};//labels for mines
 		gen=new Random();
 		f=new JFrame();
 		ask = new JPanel();
@@ -54,17 +53,17 @@ public class GUI implements ActionListener, MouseListener
 		length=new JLabel("Length: ");
 		linput=new JTextField(1);
 		winput=new JTextField(1);
-		cc.weightx=cc.weighty=1;
-		cc.fill=GridBagConstraints.BOTH;
-		ask.setLayout(new GridBagLayout());
-		cc.gridx=0;
-		cc.gridy=0;
-		cc.gridwidth=4;
-		boardSize.setHorizontalAlignment(JLabel.CENTER);
-		ask.add(boardSize,cc);
-		cc.gridy=1;
-		cc.gridwidth=1;
-		ask.add(width, cc);
+		cc.weightx=cc.weighty=1;//when you expand the screen, everything expands properly, and all the columns are distributed evenly
+		cc.fill=GridBagConstraints.BOTH;//everything fills its space entirely
+		ask.setLayout(new GridBagLayout());//make ask panel use grid bag layout
+		cc.gridx=0;//x coordinate thingy on ask panel for board size label = 0 (column 0) 
+		cc.gridy=0;//row 0 for board size label
+		cc.gridwidth=4;//number of columns - label spans all four columns
+		boardSize.setHorizontalAlignment(JLabel.CENTER);//centers label
+		ask.add(boardSize,cc);//add label with constraints to the panel
+		cc.gridy=1;//changes row 
+		cc.gridwidth=1;//limits next label to one column
+		ask.add(width, cc);//adds width label to panel
 		cc.gridx=1;
 		ask.add(winput, cc);
 		cc.gridx=2;
@@ -75,41 +74,34 @@ public class GUI implements ActionListener, MouseListener
 		cc.gridx=0;
 		cc.gridwidth=4;
 		ask.add(go, cc);
-		f.setContentPane(ask);
-		f.pack();
-		f.setVisible(true);
-		f.setSize(400,100);
+		f.setContentPane(ask);//ask what size of board the user wants to play
+		f.pack();//necessary for things to show up
+		f.setVisible(true);//makes frame visible
+		f.setSize(400,100);//sets size of frame in pixels(length, height)
 	}
-	public void setUp() throws IOException
+	public void setUp() throws IOException//sets up minesweeper game board
 	{
 		choppitychop = new ImageSplit(w,l);
-		pics = choppitychop.chop();
+		pics = choppitychop.chop();//splits image split object and assigns pieces to pics
 		panel = new JPanel();
 		kaboom = new JPanel();
 		win=new JPanel();
-		panel.setLayout(new GridBagLayout());
+		panel.setLayout(new GridBagLayout());//sets layout of main game panel to grid bag stuff
 		buttons = new JButton[l][w];
 		current=new JButton();
 		game = new Minesweeper(l,w);
-		mineNum=new JLabel("Mines: "+game.getMines()){
-			public Dimension getPreferredSize(){
-				return new Dimension(750,50);
-			}
-		};
 		boom=new JLabel("kaboom");
-		yay=new JLabel("You Win");
-		JButton button;
+		yay=new JLabel("You Didn't Explode");
+		JButton button;//button used for current button when setting up the game board
 		cc.weightx=cc.weighty=1;
 		cc.fill=GridBagConstraints.BOTH;
 		cc.gridx=0;
 		cc.gridy=buttons.length+1;
 		cc.gridwidth=buttons.length;
-		mineNum.setHorizontalAlignment(JLabel.CENTER);
-		//panel.add(mineNum, cc);
 		win.add(yay);
 		kaboom.add(boom);
 		cc.gridwidth=1;
-		for (int r=0; r<buttons.length; r++)
+		for (int r=0; r<buttons.length; r++)//add picture and interactive stuff to buttons
 			for (int c=0; c<buttons[0].length; c++)
 			{
 				button=new JButton(){
@@ -117,50 +109,50 @@ public class GUI implements ActionListener, MouseListener
 						return new Dimension(375/buttons[0].length,375/buttons.length);
 					}
 				};
-				button.setBackground(Color.BLACK);
+				button.setBackground(Color.BLACK);//DO NOT REMOVE (extremely necessary for later)
 				currentPic = new ImageIcon(pics[r][c]);
-				button.setIcon(currentPic);
-				button.addActionListener(this);
-				button.addMouseListener(this);
+				button.setIcon(currentPic);//sets picture on button to the corresponding piece of the image split thing
+				button.addActionListener(this);//allows button to do stuff on click
+				button.addMouseListener(this);//enables right click to be used
 				cc.gridx=c;
 				cc.gridy=r;
-				panel.add(button, cc);
+				panel.add(button, cc);//adds button to panel
 				buttons[r][c]=button;
 			}
-		f.setContentPane(panel);
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setContentPane(panel);//makes the content of the frame the panel
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//ends GUI when window is closed 
 		f.pack();
 		f.setVisible(true);
 		f.setSize(750,750); //width, height
 	}
 	public void actionPerformed(ActionEvent e)//click
 	{
-		if (e.getSource()==go)
+		if (e.getSource()==go)//if you click on the go button, the board is created with specified values from user input
 		{
-			w=Integer.parseInt(winput.getText());
-			l=Integer.parseInt(linput.getText());
+			w=Integer.parseInt(winput.getText());//reads user width input to variables to set size
+			l=Integer.parseInt(linput.getText());//reads user length input
 			try {
 				setUp();
-			} catch (IOException e1) {
+			} catch (IOException e1) {//picture stuff
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
-		else 
+		else //click on square, you either blow up or clear one/many squares
 		{
 			for (int r=0; r<buttons.length; r++)
 				for (int c=0; c<buttons[0].length; c++)
 				{
 					if (e.getSource()==buttons[r][c])
 					{
-						if (game.isMine(r,c))
+						if (game.isMine(r,c))//if user clicks on a mine, a window pops up saying kaboom
 						{
 							f.setContentPane(kaboom);
 							f.pack();
 							f.setVisible(true);
 							f.setSize(500,500);
 						}
-						else
+						else//clears open squares
 						{
 							game.clear(r, c);
 							for (int row=0; row<game.getOpen().length; row++)
@@ -168,10 +160,10 @@ public class GUI implements ActionListener, MouseListener
 								{
 									if (game.getOpen()[row][col])
 									{
-										buttons[row][col].setIcon(dog);
+										//buttons[row][col].setIcon(dog);
 										buttons[row][col].setBackground(Color.white);
 										buttons[row][col].setText("");
-										if (game.getMines(row, col)!=0)
+										if (game.getMines(row, col)!=0)///number stuff(number of mines touching the selected square
 										{
 											buttons[row][col].setText(Integer.toString(game.getMines(row, col)));
 										}
@@ -181,7 +173,7 @@ public class GUI implements ActionListener, MouseListener
 					}
 				}
 		}
-		if (checkWin())
+		if (checkWin())//if all non-mine squares are cleared, a window comes up saying you win
 		{
 			f.setContentPane(win);
 			f.pack();
@@ -194,7 +186,7 @@ public class GUI implements ActionListener, MouseListener
 	{
 		GUI fun = new GUI();
 	}
-	public boolean checkWin()
+	public boolean checkWin()//check if all non mine squares have been cleared
 	{
 		int fc=0;
 		for (int r=0; r<game.getOpen().length; r++)
@@ -213,7 +205,7 @@ public class GUI implements ActionListener, MouseListener
 		
 	}
 	@Override
-	public void mouseEntered(MouseEvent arg0) 
+	public void mouseEntered(MouseEvent arg0) //required to use right clicky stuff in the mousePressed method
 	{
 		for (int r=0; r<buttons.length; r++)
 			for (int c=0; c<buttons[0].length; c++)
@@ -247,10 +239,10 @@ public class GUI implements ActionListener, MouseListener
 			
 			else
 			{
-				current.setIcon(dog);
+				//current.setIcon(dog);
 				current.setBackground(Color.RED);//flags a square as a mine upon right click
-				int i=gen.nextInt(labels.length);
-				current.setText(labels[i]);
+				int i=gen.nextInt(labels.length);//random number used for selecting a random label
+				current.setText(labels[i]);//sets text to random label
 			}
 		}
 	}

@@ -17,7 +17,7 @@ public class ImageSplit {
 		cols = c;
 		chunks = rows*cols;
 		files = new String[]{"src/kittySized.png", "src/kittyReach.png", "src/look.png", "src/yellowKitty.png","src/poo.png", "src/sadKitty.png","src/happyKitty.png",
-				"src/cuteKitty.png","src/doubleKitty.png", "src/kiki.png","src/helloKitty.png"};
+				"src/cuteKitty.png","src/doubleKitty.png", "src/kiki.png","src/helloKitty.png"};//random pictures
 		gen=new Random();
 	}
 	
@@ -38,19 +38,11 @@ public class ImageSplit {
 	            imgs[x][y] = new BufferedImage(chunkWidth, chunkHeight, image.getType());
 
 	            // draws the image chunk
-	            Graphics2D gr = imgs[x][y].createGraphics();
+	            Graphics2D gr = imgs[x][y].createGraphics();//necessary but we don't know why
 	            gr.drawImage(image, 0, 0, chunkWidth, chunkHeight, chunkWidth * y, chunkHeight * x, chunkWidth * y + chunkWidth, chunkHeight * x + chunkHeight, null);
 	            gr.dispose();
 	        }
 	    }
 	    return imgs;
 	}
-	
-    /*System.out.println("Splitting done");
-
-    //writing mini images into image files
-    for (int i = 0; i < imgs.length; i++) {
-        ImageIO.write(imgs[i], "jpg", new File("img" + i + ".jpg"));
-    }
-    System.out.println("Mini images created");*/
 }
