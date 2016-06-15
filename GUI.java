@@ -10,6 +10,8 @@ import java.sql.Time;
 
 public class GUI implements ActionListener, MouseListener
 {
+	private static int screenHeight = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds().height;
+	private JButton playAgain; //click if you want to play another board of same size
 	private JButton[][] buttons;//grid of buttons forming game board
 	private JFrame f;//frame for game board
 	private JPanel panel;//panel for game board
@@ -33,7 +35,6 @@ public class GUI implements ActionListener, MouseListener
 	private int w;//width of board(set to user input) (cols)
 	private Random gen;//random number generator used to assign a random label to squares marked as mines
 	private String[] labels;//string array for random labels
-	//private ImageIcon cat;
 	private ImageIcon dog; //DON'T GET RID OF - sets the image to nothing because dog is blank
 	private BufferedImage[][] pics;//buffered image two dimensional array for picture pieces from ImageSplit
 	private ImageSplit choppitychop;//ImageSplit object for the image on top of the buttons
@@ -47,7 +48,6 @@ public class GUI implements ActionListener, MouseListener
 	public GUI()
 	{
 		dog=new ImageIcon(); //no image so shows background color and text
-		//cat=new ImageIcon("src/Eye.png");
 		labels=new String[]{"meow", "quack","boom","woof","poof","brrt", "moo", "dork", "click","zoom","oof","beep","boop","thud","plop"};//labels for mines
 		gen=new Random();
 		f=new JFrame();
@@ -88,7 +88,7 @@ public class GUI implements ActionListener, MouseListener
 	}
 	public void setUp() throws IOException//sets up minesweeper game board
 	{
-		choppitychop = new ImageSplit(l,w);
+		choppitychop = new ImageSplit(l,w,screenHeight);
 		pics = choppitychop.chop();//splits image split object and assigns pieces to pics
 		panel = new JPanel();
 		kaboom = new JPanel();
@@ -97,6 +97,8 @@ public class GUI implements ActionListener, MouseListener
 		buttons = new JButton[l][w];
 		current=new JButton();
 		game = new Minesweeper(l,w);
+		playAgain = new JButton("Play again?");
+		playAgain.addActionListener(this);
 		boom=new JLabel("kaboom");
 		yay=new JLabel("You Didn't Explode. ");
 		JButton button;//button used for current button when setting up the game board
@@ -108,13 +110,14 @@ public class GUI implements ActionListener, MouseListener
 		cc.gridy=0;
 		win.add(yay);
 		kaboom.add(boom);
+		kaboom.add(playAgain);
 		cc.gridwidth=1;
 		for (int r=0; r<buttons.length; r++)//add picture and interactive stuff to buttons
 			for (int c=0; c<buttons[0].length; c++)
 			{
 				button=new JButton(){
 					public Dimension getPreferredSize(){
-						return new Dimension(375/buttons[0].length,375/buttons.length);
+						return new Dimension(screenHeight/2/buttons[0].length,screenHeight/2/buttons.length);
 					}
 				};
 				button.setBackground(Color.BLACK);//DO NOT REMOVE (extremely necessary for later)
@@ -131,20 +134,26 @@ public class GUI implements ActionListener, MouseListener
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//ends GUI when window is closed 
 		f.pack();
 		f.setVisible(true);
-		f.setSize(750,750); //width, height
+		f.setSize(screenHeight,screenHeight); //width, height
 		start = new Date();
 		startTime = start.getTime();
 	}
 	public void actionPerformed(ActionEvent e)//click
 	{
-		if (e.getSource()==go)//if you click on the go button, the board is created with specified values from user input
+		if (e.getSource()==go)//if you click on the go button, the board is created with specified number of squares from user input
 		{
 			w=Integer.parseInt(winput.getText());//reads user width input to variables to set size
 			l=Integer.parseInt(linput.getText());//reads user length input
 			try {
 				setUp();
+			} catch (IOException e1) {//if picture file not found
+				e1.printStackTrace();
+			}
+		}
+		else if(e.getSource() == playAgain){ //set up another board of same size
+			try {
+				setUp();
 			} catch (IOException e1) {//picture stuff
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 		}
@@ -190,8 +199,9 @@ public class GUI implements ActionListener, MouseListener
 		{
 			end = new Date();
 			endTime = end.getTime();
-			time = new JLabel("It took you " + (endTime-startTime)/1000 + " seconds");
+			time = new JLabel("It took you " + (endTime-startTime)/1000 + " seconds.");
 			win.add(time);
+			win.add(playAgain);
 			f.setContentPane(win);
 			f.pack();
 			f.setVisible(true);
@@ -199,10 +209,7 @@ public class GUI implements ActionListener, MouseListener
 		}
 		
 	}
-	public static void main(String[] args)
-	{
-		GUI fun = new GUI();
-	}
+	
 	public boolean checkWin()//check if all non mine squares have been cleared
 	{
 		int fc=0;
@@ -269,6 +276,11 @@ public class GUI implements ActionListener, MouseListener
 	public void mouseReleased(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public static void main(String[] args)
+	{
+		GUI fun = new GUI();
 	}
 	
 	
